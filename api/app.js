@@ -31,17 +31,16 @@ app.get("/", (req, res) => {
 
 
 app.get("/api/users", async (req, res) => {
-    const nombreUsuario = req.body.usuario;
-    const contraseñaUsuario = req.body.contraseña;
+    const nombreUsuario = req.query.usuario;
+    const contraseñaUsuario = req.query.contraseña;
     
     try {
       await client.connect();
       const database = client.db("restaurante");
       const usuarios = database.collection("usuarios");
-  
       // Buscar el usuario por su nombre
       const user = await usuarios.findOne({ nombre: nombreUsuario,password:contraseñaUsuario});
-      console.log(user);
+     
   
       if (!user) {
         return res.status(401).json({ error: "❌ Usuario no encontrado" });
