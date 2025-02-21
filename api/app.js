@@ -40,17 +40,12 @@ app.get("/api/users", async (req, res) => {
       const usuarios = database.collection("usuarios");
   
       // Buscar el usuario por su nombre
-      const user = await usuarios.findOne({ usuario: nombreUsuario});
+      const user = await usuarios.findOne({ usuario: nombreUsuario,password:contraseñaUsuario});
       console.log(user);
   
       if (!user) {
         return res.status(401).json({ error: "❌ Usuario no encontrado" });
       }
-  
-      if (user.password !== contraseñaUsuario) {
-        return res.status(401).json({ error: "❌ Contraseña incorrecta" });
-      }
-  
       res.json({ message: "✅ Login exitoso", user });
     } catch (error) {
       console.error("Error al obtener los usuarios:", error);
