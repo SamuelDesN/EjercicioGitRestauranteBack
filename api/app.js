@@ -29,13 +29,37 @@ app.get("/", (req, res) => {
 
 
 app.get("/api/users", async (req, res) => {
-
-});
-
-
-app.post("/api/users", async (req, res) => {
+    const nombreUsuario = req.query.usuario;
+    const contraseñaUsuario = req.query.contraseña;
+    
+    try {
+      await client.connect();
+      const database = client.db("restaurante");
+      const usuarios = database.collection("usuarios");
   
-});
+      // Buscar el usuario por su nombre
+      const user = await usuarios.findOne({ usuario: nombreUsuario });
+  
+      if (!user) {
+        return res.status(401).json({ error: "❌ Usuario no encontrado" });
+      }
+  
+      if (user.contraseña !== contraseñaUsuario) {
+        return res.status(401).json({ error: "❌ Contraseña incorrecta" });
+      }
+  
+      res.json({ message: "✅ Login exitoso", user });
+    } catch (error) {
+      console.error("Error al obtener los usuarios:", error);
+      res.status(500).json({ error: "Error al obtener los usuarios" });
+    } finally {
+      
+      await client.close();
+    }
+  });
+
+
+
 
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);
