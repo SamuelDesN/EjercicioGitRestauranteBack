@@ -42,7 +42,8 @@ app.get("/api/users", async (req, res) => {
       const usuarios = database.collection("usuarios");
   
       // Buscar el usuario por su nombre
-      const user = await usuarios.findOne({ usuario: nombreUsuario, password: contraseñaUsuario });
+      const user = await usuarios.findOne({ usuario: nombreUsuario});
+      echo(user);
   
       if (!user) {
         return res.status(401).json({ error: "❌ Usuario no encontrado" });
