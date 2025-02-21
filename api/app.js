@@ -43,7 +43,7 @@ app.get("/api/users", async (req, res) => {
   
       // Buscar el usuario por su nombre
       const user = await usuarios.findOne({ usuario: nombreUsuario});
-      echo(user);
+      console.log(user);
   
       if (!user) {
         return res.status(401).json({ error: "❌ Usuario no encontrado" });
