@@ -33,8 +33,8 @@ app.get("/", (req, res) => {
 
 
 app.get("/api/users", async (req, res) => {
-    const nombreUsuario = req.query.usuario;
-    const contraseñaUsuario = req.query.contraseña;
+    const nombreUsuario = req.body.usuario;
+    const contraseñaUsuario = req.body.contraseña;
     
     try {
       await client.connect();
@@ -48,7 +48,7 @@ app.get("/api/users", async (req, res) => {
         return res.status(401).json({ error: "❌ Usuario no encontrado" });
       }
   
-      if (user.contraseña !== contraseñaUsuario) {
+      if (user.password !== contraseñaUsuario) {
         return res.status(401).json({ error: "❌ Contraseña incorrecta" });
       }
   
