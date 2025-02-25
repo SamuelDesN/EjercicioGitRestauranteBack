@@ -31,31 +31,60 @@ app.get("/", (req, res) => {
 
 
 app.get("/api/users", async (req, res) => {
+
     const nombreUsuario = req.query.usuario;
     const contraseñaUsuario = req.query.contraseña;
-    
-    try {
+    if(nombreUsuario==undefined||contraseñaUsuario==undefined){
       await client.connect();
       const database = client.db("restaurante");
       const usuarios = database.collection("usuarios");
-      // Buscar el usuario por su nombre
-      const user = await usuarios.findOne({ nombre: nombreUsuario,password:contraseñaUsuario});
-     
-  
-      if (!user) {
-        return res.status(401).json({ error: "❌ Usuario no encontrado" });
-      }
+      const user = await usuarios.findOne({ login: true});
       res.json({ message: "✅ Login exitoso", user });
-    } catch (error) {
-      console.error("Error al obtener los usuarios:", error);
-      res.status(500).json({ error: "Error al obtener los usuarios" });
-    } finally {
-      
-      await client.close();
+    }
+    else{
+      try {
+        await client.connect();
+        const database = client.db("restaurante");
+        const usuarios = database.collection("usuarios");
+        usuarios.updateOne({nombre: nombreUsuario,password:contraseñaUsuario}, { $set: { login: true} });
+        const user = await usuarios.findOne({ login: true});
+    
+        if (!user) {
+          return res.status(401).json({ error: "❌ Usuario no encontrado" });
+        }
+        res.json({ message: "✅ Login exitoso", user });
+      } catch (error) {
+        console.error("Error al obtener los usuarios:", error);
+        res.status(500).json({ error: "Error al obtener los usuarios" });
+      }
     }
   });
-
-
+app.post("/api/users",async (res)=>{
+  
+  try {
+    await client.connect();
+    const database = client.db("restaurante");
+    const usuarios = database.collection("usuarios");
+    await usuarios.updateOne({login:true},{$set:{login:false}});
+  } catch (error) {
+    console.error("Error al cerrar la sesion del usuario:", error);
+    res.status(500).json({
+      message: "Error al cerrar la sesion del usuario",
+      error: error.message,
+    });
+  }  
+})
+app.get("/api/mesas",async (req, res) => {
+  try {
+    await client.connect();
+    const database = client.db("restaurante");
+    const mesas = database.collection("mesas");
+    const lista_mesas= await mesas.findOne()
+    res.json(lista_mesas);
+  } catch (error) {
+    console.error("Error al cerrar la sesion del usuario:", error);
+  }
+})
 
 
 app.use(middlewares.notFound);
