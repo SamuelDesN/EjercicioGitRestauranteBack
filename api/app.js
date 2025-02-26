@@ -89,7 +89,20 @@ app.get("/api/mesas", async (req, res) => {
   }
 });
 
+app.get("/api/pedidos", async (req, res) => {
+  try {
+    await client.connect();
+    const database = client.db("restaurante");
+    const pedidos = database.collection("pedidos");
+    
+    const lista_pedidos = await pedidos.find({}).toArray();
 
+    res.json(lista_pedidos);
+  } catch (error) {
+    console.error("Error al obtener las mesas:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
 
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);
