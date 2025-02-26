@@ -74,17 +74,21 @@ app.post("/api/users",async (res)=>{
     });
   }  
 })
-app.get("/api/mesas",async (req, res) => {
+app.get("/api/mesas", async (req, res) => {
   try {
     await client.connect();
     const database = client.db("restaurante");
     const mesas = database.collection("mesas");
-    const lista_mesas= await mesas.findOne()
+    
+    const lista_mesas = await mesas.find({}).toArray();
+
     res.json(lista_mesas);
   } catch (error) {
-    console.error("Error al cerrar la sesion del usuario:", error);
+    console.error("Error al obtener las mesas:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
-})
+});
+
 
 
 app.use(middlewares.notFound);
