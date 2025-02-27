@@ -59,21 +59,23 @@ app.get("/api/users", async (req, res) => {
       }
     }
   });
-app.post("/api/users",async (res)=>{
+  app.post("/api/users", async (req, res) => {
+    try {
+      const database = client.db("restaurante");
+      const usuarios = database.collection("usuarios");
   
-  try {
-    await client.connect();
-    const database = client.db("restaurante");
-    const usuarios = database.collection("usuarios");
-    await usuarios.updateOne({login:true},{$set:{login:false}});
-  } catch (error) {
-    console.error("Error al cerrar la sesion del usuario:", error);
-    res.status(500).json({
-      message: "Error al cerrar la sesion del usuario",
-      error: error.message,
-    });
-  }  
-})
+      await usuarios.updateOne({ login: true }, { $set: { login: false } });
+  
+      res.status(200).json({ message: "Sesión cerrada correctamente" });
+    } catch (error) {
+      console.error("Error al cerrar la sesión del usuario:", error);
+      res.status(500).json({
+        message: "Error al cerrar la sesión del usuario",
+        error: error.message,
+      });
+    }
+  });
+  
 app.get("/api/mesas", async (req, res) => {
   try {
     await client.connect();
