@@ -25,7 +25,7 @@ const client = new MongoClient(uri);
 
 app.get("/", (req, res) => {
     res.json({
-        message: 'On',
+        message: 'asdasd',
     });
 });
 
@@ -92,6 +92,21 @@ app.get("/api/pedidos", async (req, res) => {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
+app.post("/api/mesas", async (req, res) => {
+  let usuarionuevo=req.body
+  try {
+    const database = client.db("restaurante");
+    const pedidos = database.collection("mesas");
+    await pedidos.insertOne(usuarionuevo);
+    res.json({usuarionuevo})
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
+
+
 
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);
