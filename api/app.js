@@ -98,7 +98,7 @@ app.put("/api/mesas/reservar", async (req, res) => {
   }
 });
 
-//Borrar pedidos
+//Borrar reserva
 app.put("/api/mesas/borrarReserva", async (req, res) => {
   const { nombreMesa } = req.body;
   try {
@@ -155,6 +155,21 @@ app.post("/api/pedidos", async (req, res) => {
     res.json({ message: "Pedido insertado exitosamente", result });
   } catch (error) {
     console.error("Error al insertar el pedido:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+//Borrar pedidos
+app.delete("/api/pedidos/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    await client.connect();
+    const database = client.db("restaurante");
+    const pedidos = database.collection("pedidos");
+    const result = await pedidos.deleteOne({ _id: new ObjectId(id) });
+    res.json({ message: "Pedido eliminado exitosamente", result });
+  } catch (error) {
+    console.error("Error al eliminar el pedido:", error);
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
