@@ -25,7 +25,7 @@ const client = new MongoClient(uri);
 
 app.get("/", (req, res) => {
     res.json({
-        message: 'asdasd',
+        message: 'on',
     });
 });
 
