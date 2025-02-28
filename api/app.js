@@ -63,6 +63,8 @@ app.get("/api/login", async (req, res) => {
     }
   });
   
+
+//Listar mesas
 app.get("/api/mesas", async (req, res) => {
   try {
     await client.connect();
@@ -78,6 +80,46 @@ app.get("/api/mesas", async (req, res) => {
   }
 });
 
+//Reservar Mesa
+app.put("/api/mesas/reservar", async (req, res) => {
+  const { nombreMesa, nombreReserva } = req.body;
+  try {
+    await client.connect();
+    const database = client.db("restaurante");
+    const mesas = database.collection("mesas");
+    const result = await mesas.updateOne(
+      { nombreMesa: nombreMesa },
+      { $set: { estado: "Ocupada", nombreReserva: nombreReserva } }
+    );
+    res.json({ message: "Mesa reservada", result });
+  } catch (error) {
+    console.error("Error al reservar la mesa:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+//Borrar pedidos
+app.put("/api/mesas/borrarReserva", async (req, res) => {
+  const { nombreMesa } = req.body;
+  try {
+    await client.connect();
+    const database = client.db("restaurante");
+    const mesas = database.collection("mesas");
+    const result = await mesas.updateOne(
+      { nombreMesa: nombreMesa },
+      { 
+        $set: { estado: "Libre" },
+        $unset: { nombreReserva: "" }
+      }
+    );
+    res.json({ message: "Reserva borrada exitosamente", result });
+  } catch (error) {
+    console.error("Error al borrar la reserva:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+//Listar pedidos
 app.get("/api/pedidos", async (req, res) => {
   try {
     await client.connect();
@@ -92,19 +134,47 @@ app.get("/api/pedidos", async (req, res) => {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
-app.post("/api/mesas", async (req, res) => {
-  let usuarionuevo=req.body
+
+//Hacer pedidos
+app.post("/api/pedidos", async (req, res) => {
+  const { nombreCliente, direccion, telefono, items, total } = req.body;
   try {
+    await client.connect();
     const database = client.db("restaurante");
-    const pedidos = database.collection("mesas");
-    await pedidos.insertOne(usuarionuevo);
-    res.json({usuarionuevo})
-  } catch (error) {
-    res.status(500).json({
-      error: error.message,
+    const pedidos = database.collection("pedidos");
+    
+    // Insertar el pedido en la base de datos
+    const result = await pedidos.insertOne({
+      nombreCliente,
+      direccion,
+      telefono,
+      items,
+      total,
+      fecha: new Date()  
     });
+    res.json({ message: "Pedido insertado exitosamente", result });
+  } catch (error) {
+    console.error("Error al insertar el pedido:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
+
+//listar platos
+app.get("/api/platos", async (req, res) => {
+  try {
+    await client.connect();
+    const database = client.db("restaurante");
+    const platos = database.collection("platos");
+    
+    const lista_platos = await platos.find({}).toArray();
+
+    res.json(lista_platos);
+  } catch (error) {
+    console.error("Error al obtener los platos:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
 
 
 
